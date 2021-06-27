@@ -1,0 +1,46 @@
+[
+  {
+    "id": "1",
+    "avatars": [
+      "https://source.unsplash.com/random/100x100?1",
+      "https://source.unsplash.com/random/100x100?2"
+    ],
+    "guestsCount": 274,
+    "speakersCount": 4,
+    "title": "Create room",
+    "guests": ["Vasya pupkin", "jojo"]
+  },
+  {
+    "id": "2",
+    "avatars": [
+      "https://source.unsplash.com/random/100x100?1",
+      "https://source.unsplash.com/random/100x100?2"
+    ],
+    "guestsCount": 274,
+    "speakersCount": 4,
+    "title": "Create room",
+    "guests": ["Vasya pupkin", "jojo"]
+  },
+  {
+    "id": "3",
+    "avatars": [
+      "https://source.unsplash.com/random/100x100?1",
+      "https://source.unsplash.com/random/100x100?2"
+    ],
+    "guestsCount": 274,
+    "speakersCount": 4,
+    "title": "Create room",
+    "guests": ["Vasya pupkin", "jojo"]
+  },
+  {
+    "id": "4",
+    "avatars": [
+      "https://source.unsplash.com/random/100x100?1",
+      "https://source.unsplash.com/random/100x100?2"
+    ],
+    "guestsCount": 274,
+    "speakersCount": 4,
+    "title": "Create room",
+    "guests": ["Vasya pupkin", "jojo"]
+  }
+]
