@@ -6,16 +6,37 @@ import styles from './ChooseAvatarStep.module.scss';
 import { Avatar } from '../../Avatar';
 import { MainContext } from '../../../pages';
 import { Button } from '../../Button/Button';
+import Axios from '../../../api/api';
+
+const uploadFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append('photo', file);
+  const { data } = await Axios.post('/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return data;
+};
 
 export const ChooseAvatarStep: React.FC = () => {
-  const { onNextStep } = React.useContext(MainContext);
-  const [avatar, setAvatar] = React.useState('')
+  const { onNextStep, setFiledValue } = React.useContext(MainContext);
+  const [avatar, setAvatar] = React.useState('');
   const inputFileRef = React.useRef<HTMLInputElement>(null);
 
   const handleChangeImage = async (event: Event) => {
-    const file = (event.target as HTMLInputElement).files[0]
-    const imgUrl = URL.createObjectURL(file)
-    setAvatar(imgUrl)
+    const targer = event.target as HTMLInputElement;
+    const file = targer.files[0];
+    if (file) {
+      const imgUrl = URL.createObjectURL(file);
+      setAvatar(imgUrl);
+      const data = await uploadFile(file);
+      console.log(data);
+      targer.value = '';
+      setAvatar(data.url);
+      setFiledValue('avatarUrl', data.url);
+    }
   };
 
   React.useEffect(() => {
@@ -29,7 +50,7 @@ export const ChooseAvatarStep: React.FC = () => {
       <StepInfo title="" icon="/static/celebration.png" description="How’s this photo?" />
       <WhiteBlock className={clsx('m-auto mt-40', styles.whiteBlock)}>
         <div className={styles.avatar}>
-          <Avatar src={avatar}  width="120px" height="120px" />
+          <Avatar src={avatar} width="120px" height="120px" />
         </div>
         <div className="mb-30">
           <label htmlFor="image" className="link cup">
@@ -39,7 +60,7 @@ export const ChooseAvatarStep: React.FC = () => {
         <input id="image" ref={inputFileRef} type="file" hidden />
         <Button onClick={onNextStep}>
           Next
-          <img  className="d-ib ml-10" src="/static/arrow.svg" />
+          <img className="d-ib ml-10" src="/static/arrow.svg" />
         </Button>
       </WhiteBlock>
     </div>

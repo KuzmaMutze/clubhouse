@@ -1,6 +1,20 @@
 import passport from 'passport';
 import { Strategy as GithubStrategy } from 'passport-github';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import { User } from '../../models';
+import { createJwtToken } from '../utils/createJWTToken';
+
+const opts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET_KEY,
+};
+
+passport.use(
+  'jwt',
+  new JwtStrategy(opts, function (jwt_payload, done) {
+    done(null, jwt_payload);
+  }),
+);
 
 passport.use(
   'github',
@@ -12,6 +26,7 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, cb) => {
       try {
+        let userData;
         const obj = {
           fullname: profile.displayName,
           avatarUrl: profile.photos?.[0].value,
@@ -19,6 +34,8 @@ passport.use(
           username: profile.username,
           phone: '',
         };
+
+        obj.token = createJwtToken(obj);
 
         const findUser = await User.findOne({
           where: {
@@ -29,11 +46,16 @@ passport.use(
         if (!findUser) {
           const user = await User.create(obj);
           console.log(user);
-
-          cb(null, user.toJSON());
+          userData = user.toJSON();
+          // cb(null, user.toJSON());
+        } else {
+          userData = await findUser.toJSON();
         }
 
-        cb(null, findUser);
+        cb(null, {
+          ...userData,
+          token: createJwtToken(userData),
+        });
       } catch (error) {
         cb(error);
         console.log(error);

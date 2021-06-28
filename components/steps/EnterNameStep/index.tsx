@@ -9,17 +9,18 @@ import { MainContext } from '../../../pages';
 import { Avatar } from '../../Avatar';
 
 export const EnterNameStep = () => {
-  const { onNextStep } = React.useContext(MainContext);
-  const [inputValue, setInputValue] = React.useState<string>('');
+  const { onNextStep, userData, setFiledValue } = React.useContext(MainContext);
+  const [inputValue, setInputValue] = React.useState<string>(userData.username);
   const nextDisabled = !inputValue;
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.currentTarget.value)
-  }
+    setInputValue(event.currentTarget.value);
+  };
 
   const onClickNextStep = () => {
-    onNextStep()
-  }
+    setFiledValue('fullname', inputValue);
+    onNextStep();
+  };
 
   return (
     <div className={styles.block}>
@@ -29,7 +30,7 @@ export const EnterNameStep = () => {
         description="People use real names on Clubhouse :) Thnx!"
       />
       <WhiteBlock className={clsx('m-auto', styles.whiteBlock)}>
-        <Avatar src={''} width="120px" height="120px" />
+        <Avatar src={userData.avatarUrl} width="120px" height="120px" />
         <div className="mt-30 mb-30">
           <input
             onChange={handleChangeInput}

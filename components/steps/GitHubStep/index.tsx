@@ -7,12 +7,13 @@ import { StepInfo } from '../../StepInfo/StepInfo';
 import styles from './GitHubStep.module.scss';
 import React, { useEffect } from 'react';
 import { MainContext } from '../../../pages';
+import jsCookie from 'js-cookie';
 
 export const GitHubStep: React.FC = () => {
-  const { onNextStep } = React.useContext(MainContext);
+  const { onNextStep, setUserData } = React.useContext(MainContext);
 
   const onClickAuth = () => {
-    const win = window.open(
+    window.open(
       'http://localhost:3001/auth/github',
       'Auth',
       'width=500,height=500,status=yes,toolbar=no,menubar=no,location=no',
@@ -20,9 +21,15 @@ export const GitHubStep: React.FC = () => {
   };
 
   useEffect(() => {
-    window.addEventListener('message', (data) => {
-      console.log(data);
-      onNextStep();
+    window.addEventListener('message', ({ data }) => {
+      const user = data;
+      if (typeof user === 'string' && user.includes('avatarUrl')) {
+        const json = JSON.parse(user);
+        setUserData(json);
+        onNextStep();
+
+        jsCookie.set('token', json.token);
+      }
     });
   }, []);
 
