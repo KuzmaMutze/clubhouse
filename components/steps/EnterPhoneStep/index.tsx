@@ -7,6 +7,7 @@ import { StepInfo } from '../../StepInfo/StepInfo';
 
 import styles from './EnterPhoneStep.module.scss';
 import { MainContext } from '../../../pages/index';
+import { authAPI } from '../../../api/api';
 
 type InputValueState = {
   formattedValue: string;
@@ -14,7 +15,7 @@ type InputValueState = {
 };
 
 export const EnterPhoneStep = () => {
-  const { onNextStep } = React.useContext(MainContext);
+  const { onNextStep, setFiledValue } = React.useContext(MainContext);
   const [isLoading, setIsLoading] = React.useState(false);
   const [values, setValues] = React.useState<InputValueState>({} as InputValueState);
 
@@ -22,11 +23,15 @@ export const EnterPhoneStep = () => {
 
   const onSubmit = async () => {
     try {
-      
+      setIsLoading(true);
+      await authAPI.sendSMSOnTel(values.value);
+      setFiledValue('phone', values.value);
+      onNextStep();
+      setIsLoading(false);
     } catch (error) {
-      
+      console.warn('Ошибка при отправке СМС', error);
     } finally {
-     
+      setIsLoading(false);
     }
   };
 

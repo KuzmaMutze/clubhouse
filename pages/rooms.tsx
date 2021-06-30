@@ -1,15 +1,15 @@
 import { Header } from '../components/Header';
-
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
-
 import { GetServerSideProps, NextPage } from 'next';
 import { useDispatch } from 'react-redux';
 import { Button } from '../components/Button/Button';
 import { ConversationCard } from '../components/ConversationCard';
 import Axios from '../api/api';
 import { useRouter } from 'next/router';
+// import JsCookies from 'js-cookie';
+import { checkAuth } from '../helpers/checkAuth';
 
 const RoomsPage: NextPage = ({ rooms }: any) => {
   const router = useRouter();
@@ -46,21 +46,28 @@ const RoomsPage: NextPage = ({ rooms }: any) => {
   );
 };
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (context) => {
   try {
-    const { data } = await Axios.get('rooms.json');
-    return {
-      props: {
-        rooms: data,
-      },
-    };
+    const user = await checkAuth(context);
+    console.log(user, 'USER DATA !!!!');
+
+    if (!user) {
+      return {
+        props: {},
+        redirect: {
+          permanent: false,
+          destination: '/',
+        },
+      };
+    }
   } catch (error) {
-    return {
-      props: {
-        rooms: [],
-      },
-    };
+    console.log('Error with rooms checkAuth!');
   }
+  return {
+    props: {
+      rooms: [],
+    },
+  };
 };
 
 export default RoomsPage;

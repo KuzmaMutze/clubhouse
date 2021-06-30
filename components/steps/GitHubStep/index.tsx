@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-// import Cookies from 'js-cookie';
 import { WhiteBlock } from '../../WhiteBlock/WhiteBlock';
 import { Button } from '../../Button/Button';
 import { StepInfo } from '../../StepInfo/StepInfo';
@@ -24,6 +23,7 @@ export const GitHubStep: React.FC = () => {
     window.addEventListener('message', ({ data }) => {
       const user = data;
       if (typeof user === 'string' && user.includes('avatarUrl')) {
+        jsCookie.remove('token');
         const json = JSON.parse(user);
         setUserData(json);
         onNextStep();
@@ -44,7 +44,9 @@ export const GitHubStep: React.FC = () => {
           Import from GitHub
           <img className="d-ib ml-10" src="/static/arrow.svg" />
         </Button>
-        <div className="link mt-20 cup d-ib">Enter my info manually</div>
+        <div onClick={onNextStep} className="link mt-20 cup d-ib">
+          Enter my info manually
+        </div>
       </WhiteBlock>
     </div>
   );

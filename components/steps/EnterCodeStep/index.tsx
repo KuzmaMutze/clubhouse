@@ -4,29 +4,44 @@ import { useRouter } from 'next/router';
 import { WhiteBlock } from '../../WhiteBlock/WhiteBlock';
 import { StepInfo } from '../../StepInfo/StepInfo';
 
-
 import styles from './EnterPhoneStep.module.scss';
-// import { MainContext } from '../../../pages';
+import { MainContext } from '../../../pages';
+import { authAPI } from '../../../api/api';
+import { Button } from '../../Button/Button';
 
 export const EnterCodeStep = () => {
   const router = useRouter();
-  // const { userData } = React.useContext(MainContext);
+  const { userData } = React.useContext(MainContext);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [codes, setCodes] = React.useState(['', '', '', '']);
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    
+    const index = Number(event.target.getAttribute('id'));
+
+    const value = event.target.value;
+    setCodes((prev) => {
+      const newArr = [...prev];
+      newArr[index] = value;
+      return newArr;
+    });
+    if (event.target.nextSibling) {
+      (event.target.nextSibling as HTMLInputElement).focus();
+    } else {
+      onSubmit([...codes, value].join(''));
+    }
   };
 
-  const onSubmit =  (code: string) => {
-    // try {
-      
+  const onSubmit = async (code: string) => {
+    try {
+      setIsLoading(true);
+      await authAPI.activateCode(code);
       router.push('/rooms');
-    // } catch (error) {
-    
-    // }
+    } catch (error) {
+      alert('Ошибка при активации');
+      setCodes(['', '', '', '']);
+    }
 
-    // setIsLoading(false);
+    setIsLoading(false);
   };
 
   return (
@@ -48,6 +63,16 @@ export const EnterCodeStep = () => {
                 />
               ))}
             </div>
+            {/* <Button disabled={isLoading} onClick={onSubmit}>
+              {isLoading ? (
+                'Sending...'
+              ) : (
+                <>
+                  Next
+                  <img className="d-ib ml-10" src="/static/arrow.svg" />
+                </>
+              )}
+            </Button> */}
           </WhiteBlock>
         </>
       ) : (

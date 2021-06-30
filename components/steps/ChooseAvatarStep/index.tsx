@@ -21,8 +21,8 @@ const uploadFile = async (file: File) => {
 };
 
 export const ChooseAvatarStep: React.FC = () => {
-  const { onNextStep, setFiledValue } = React.useContext(MainContext);
-  const [avatar, setAvatar] = React.useState('');
+  const { onNextStep, setFiledValue, userData } = React.useContext(MainContext);
+  const [avatar, setAvatar] = React.useState(userData.avatarUrl);
   const inputFileRef = React.useRef<HTMLInputElement>(null);
 
   const handleChangeImage = async (event: Event) => {

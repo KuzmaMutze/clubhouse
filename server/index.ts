@@ -20,7 +20,8 @@ dotenv.config({
 import './core/db';
 
 import { passport } from './core/passport';
-import axios from 'axios';
+
+import AuthController from './controllers/AuthController';
 
 const app = express();
 const uploader = multer({
@@ -33,9 +34,6 @@ const uploader = multer({
     },
   }),
 });
-
-const randomeCode = (max: number = 9999, min: number = 1000) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
 
 app.use(cors());
 app.use(express.json());
@@ -59,42 +57,19 @@ app.post('/upload', uploader.single('photo'), (req, res) => {
     });
 });
 
-app.get('/auth/sms', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  const phone = req.query.phone;
-  const userId = req.user.id;
-  const smsCode = randomeCode();
-  if (!phone) {
-    return res.status(400).send();
-  }
+app.get(
+  '/auth/sms/activate',
+  passport.authenticate('jwt', { session: false }),
+  AuthController.smsActivate,
+);
 
-  try {
-    // await axios.get(
-    //   `https://sms.ru/sms/send?api_id=${process.env.SMS_API_KEY}&to=79967459082&msg=${smsCode}`,
-    // );
-    await Code.create({
-      code: smsCode,
-      user_id: userId,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: 'Error with SMS message',
-    });
-  }
-});
+app.get('/auth/sms', passport.authenticate('jwt', { session: false }), AuthController.smsSend);
 app.get('/auth/github', passport.authenticate('github'));
-app.get('/auth/me', passport.authenticate('jwt', { session: false }), (req, res) => {
-  res.json(req.user);
-});
+app.get('/auth/me', passport.authenticate('jwt', { session: false }), AuthController.getMe);
 app.get(
   '/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
-  (req, res) => {
-    res.send(
-      `<script>window.opener.postMessage('${JSON.stringify(
-        req.user,
-      )}', '*');window.close();</script>`,
-    );
-  },
+  AuthController.githubCallback,
 );
 
 app.listen(3001, () => {
